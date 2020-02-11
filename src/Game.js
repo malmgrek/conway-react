@@ -7,6 +7,14 @@ const WIDTH = 800;
 const HEIGHT = 600;
 
 
+/**
+ * TODO:
+ *  - Options for boundary conditions
+ *  - Select cells with keyboard
+ *  - Options to select some well-known cells
+ */
+
+
 class Cell extends React.Component {
 
   render() {
@@ -33,7 +41,9 @@ class Game extends React.Component {
   }
 
   state = {
-    cells: []
+    cells: [],
+    interval: 100,
+    isRunning: false
   }
 
   // Create an empty board
@@ -87,8 +97,99 @@ class Game extends React.Component {
 
   }
 
+  runGame = () => {
+    this.setState({ isRunning: true });
+    this.runIteration();
+  }
+
+  stopGame = () => {
+    this.setState({ isRunning: false });
+    if (this.timeoutHandler) {
+      window.clearTimeout(this.timeoutHandler);
+      this.timeoutHandler = null;
+    }
+  }
+
+  runIteration() {
+    console.log("running iteration");
+    let newBoard = this.makeEmptyBoard();
+
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        let neighbors = this.calculateNeighbors(this.board, x, y);
+        if (this.board[y][x]) {
+          if (neighbors === 2 || neighbors === 3) {
+            newBoard[y][x] = true;
+          } else {
+            newBoard[y][x] = false;
+          }
+        } else {
+          if (!this.board[y][x] && neighbors === 3) {
+            newBoard[y][x] = true;
+          }
+        }
+      }
+    }
+
+    this.board = newBoard;
+    this.setState({ cells: this.makeCells() });
+    this.timeoutHandler = window.setTimeout(() => {
+      this.runIteration();
+    }, this.state.interval);
+  }
+
+  /**
+   * Calculate the number of neighbors at point (x, y)
+   * @param {Array} board
+   * @param {int} x
+   * @param {int} y
+   */
+  calculateNeighbors(board, x, y) {
+    let neighbors = 0;
+    const dirs = [
+      [-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]
+    ];
+    for (let i = 0; i < dirs.length; i++) {
+      const dir = dirs[i];
+      let y1 = y + dir[0];
+      let x1 = x + dir[1];
+
+      if (
+        x1 >= 0 &&
+        x1 < this.cols &&
+        y1 >= 0 &&
+        y1 < this.rows &&
+        board[y1][x1]
+      ) {
+        neighbors++;
+      }
+    }
+
+    return neighbors;
+  }
+
+  handleIntervalChange = (e) => {
+    this.setState({ interval: e.target.value });
+  }
+
+
+  handleClear = () => {
+    this.board = this.makeEmptyBoard();
+    this.setState({ cells: this.makeCells() });
+  }
+
+  handleRandom = () => {
+    for (let y = 0; y < this.rows; y++) {
+      for (let x = 0; x < this.cols; x++) {
+        this.board[y][x] = (Math.random() >= 0.5);
+      }
+    }
+
+    this.setState({ cells: this.makeCells() });
+  }
+
   render() {
-    const { cells } = this.state;
+    const { cells, interval, isRunning } = this.state;
     return (
       <div>
         <div
@@ -110,6 +211,18 @@ class Game extends React.Component {
               />
             )
           )}
+        </div>
+
+        <div className="controls">
+          Update every <input
+            value={this.state.interval}
+            onChange={this.handleIntervalChange} /> msec
+          {isRunning ?
+            <button className="button" onClick={this.stopGame}>Stop</button> :
+            <button className="button" onClick={this.runGame}>Run</button>
+          }
+          <button className="button" onClick={this.handleRandom}>Random</button>
+          <button className="button" onClick={this.handleClear}>Clear</button>
         </div>
       </div>
     );
