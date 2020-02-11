@@ -220,7 +220,12 @@ class Game extends React.Component {
           }
           <button className="button" onClick={this.handleRandom}>Random</button>
           <button className="button" onClick={this.handleClear}>Clear</button>
+          <select className="dropdown">
+            <option value="fixed">Fixed</option>
+            <option value="periodic">Periodic</option>
+          </select>
         </div>
+
       </div>
     );
   }
