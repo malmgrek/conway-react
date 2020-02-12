@@ -6,6 +6,9 @@ const CELL_SIZE = 20;
 const WIDTH = 800;
 const HEIGHT = 600;
 
+const compose = (...fns) => (x) => fns.reduceRight((v, f) => f(v), x);
+const pipe = (x, ...fns) => compose(...fns)(x)
+
 
 /**
  * TODO:
@@ -40,7 +43,8 @@ class Game extends React.Component {
   state = {
     cells: [],
     interval: 100,
-    isRunning: false
+    isRunning: false,
+    bc: "periodic"
   }
 
   // Create an empty board
@@ -78,7 +82,6 @@ class Game extends React.Component {
   }
 
   handleClick = (e) => {
-
     const elemOffset = this.getElementOffset();
     const offsetX = e.clientX - elemOffset.x;
     const offsetY = e.clientY - elemOffset.y;
@@ -143,23 +146,47 @@ class Game extends React.Component {
    */
   calculateNeighbors(board, x, y) {
     let neighbors = 0;
+
     const dirs = [
       [-1, -1], [-1, 0], [-1, 1], [0, 1], [1, 1], [1, 0], [1, -1], [0, -1]
     ];
+
+    const isNeighbor = (dir) => {
+      if (this.state.bc === "fixed") {
+
+        let y1 = y + dir[0];
+        let x1 = x + dir[1];
+
+        return (
+          x1 >= 0 && x1 < this.cols && y1 >= 0 && y1 < this.rows &&
+          board[y1][x1]
+        );
+
+      } else if (this.state.bc === "periodic") {
+
+        let y1 = pipe(
+          y + dir[0],
+          z => z >= 0 ? z : this.rows - 1,
+          z => z < this.rows ? z : 0
+        );
+        let x1 = pipe(
+          x + dir[1],
+          z => z >= 0 ? z : this.cols - 1,
+          z => z < this.cols ? z : 0
+        );
+
+        return board[y1][x1];
+
+      }
+    }
+
     for (let i = 0; i < dirs.length; i++) {
       const dir = dirs[i];
-      let y1 = y + dir[0];
-      let x1 = x + dir[1];
 
-      if (
-        x1 >= 0 &&
-        x1 < this.cols &&
-        y1 >= 0 &&
-        y1 < this.rows &&
-        board[y1][x1]
-      ) {
+      if (isNeighbor(dir)) {
         neighbors++;
       }
+
     }
 
     return neighbors;
@@ -183,6 +210,10 @@ class Game extends React.Component {
     }
 
     this.setState({ cells: this.makeCells() });
+  }
+
+  handleBcChange = (e) => {
+    this.setState({ bc: e.target.value });
   }
 
   render() {
@@ -220,9 +251,12 @@ class Game extends React.Component {
           }
           <button className="button" onClick={this.handleRandom}>Random</button>
           <button className="button" onClick={this.handleClear}>Clear</button>
-          <select className="dropdown">
-            <option value="fixed">Fixed</option>
-            <option value="periodic">Periodic</option>
+          <select
+            className="dropdown"
+            value={this.state.bc}
+            onChange={this.handleBcChange}>
+            <option value="fixed">Fixed BC</option>
+            <option value="periodic">Periodic BC</option>
           </select>
         </div>
 
