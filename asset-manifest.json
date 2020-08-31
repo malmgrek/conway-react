@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/conway-react/static/css/main.8802b175.chunk.css",
+    "main.js": "/conway-react/static/js/main.a9adec0c.chunk.js",
+    "main.js.map": "/conway-react/static/js/main.a9adec0c.chunk.js.map",
+    "runtime-main.js": "/conway-react/static/js/runtime-main.47e95d86.js",
+    "runtime-main.js.map": "/conway-react/static/js/runtime-main.47e95d86.js.map",
+    "static/js/2.26d3b186.chunk.js": "/conway-react/static/js/2.26d3b186.chunk.js",
+    "static/js/2.26d3b186.chunk.js.map": "/conway-react/static/js/2.26d3b186.chunk.js.map",
+    "index.html": "/conway-react/index.html",
+    "precache-manifest.1675079e83d88af2c7f1e1a694029d25.js": "/conway-react/precache-manifest.1675079e83d88af2c7f1e1a694029d25.js",
+    "service-worker.js": "/conway-react/service-worker.js",
+    "static/css/main.8802b175.chunk.css.map": "/conway-react/static/css/main.8802b175.chunk.css.map",
+    "static/js/2.26d3b186.chunk.js.LICENSE.txt": "/conway-react/static/js/2.26d3b186.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.47e95d86.js",
+    "static/js/2.26d3b186.chunk.js",
+    "static/css/main.8802b175.chunk.css",
+    "static/js/main.a9adec0c.chunk.js"
+  ]
+}
